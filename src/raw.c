@@ -1,6 +1,6 @@
-#include "term.h"
+#include "raw.h"
 
-int set_raw_mode() {
+TC_ERR set_raw_mode() {
     struct termios raw;
 
     if (tcgetattr(STDIN_FILENO, &raw) == -1) {
@@ -23,14 +23,14 @@ int set_raw_mode() {
     return TC_NOERR;
 }
 
-int restore_mode(struct termios *original) {
+TC_ERR restore_mode(struct termios *original) {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, original) == -1) {
         return TC_SET_ATTR_ERR;
     }
     return TC_NOERR;
 }
 
-int save_original(struct termios *original) {
+TC_ERR save_original(struct termios *original) {
     if (tcgetattr(STDIN_FILENO, original) == -1) {
         return TC_GET_ATTR_ERR;
     }
