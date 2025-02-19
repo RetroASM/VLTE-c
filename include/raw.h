@@ -12,6 +12,6 @@ typedef enum {
     TC_SET_ATTR_ERR = 3
 } TC_ERR ;
 
-static TC_ERR set_raw_mode(void);
+TC_ERR set_raw_mode(void);
 TC_ERR restore_mode(struct termios *original);
 TC_ERR save_original(struct termios *original);

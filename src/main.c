@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include "raw.h"
-#include "editor.h"
+#include "../include/editor.h"
+#include "../include/raw.h"
 
 int main(void) {
     struct termios original_settings;
@@ -8,18 +7,35 @@ int main(void) {
 
     set_raw_mode();
 
-    bool running = true;
-    bool insert_mode = false;
     Editor editor = editor_new();
-    while (running) {
-        if (insert_mode) {
-            // TODO: write to the buffer
+    while (editor.running) {
+        if (editor.should_update == 1) {
+            editor_update(&editor);
+        }
+
+        if (editor.insert_mode) {
+            char key = '\x1b';
+            read(STDIN_FILENO, &key, 1);
+            switch (key) {
+            case '\x1b':
+                editor.insert_mode = 0;
+                break;
+            default:
+                editor_write(&editor, key);
+                break;
+            }
+
             continue;
         }
 
+
+        // NORMAL MODE
         char key = '\x1b';
         read(STDIN_FILENO, &key, 1);
         switch (key) {
+        case 'i':
+            editor.insert_mode = 1;
+            break;
         case 'h':
             editor_move(&editor, 1, DIR_LEFT);
             break;
@@ -32,15 +48,11 @@ int main(void) {
         case 'j':
             editor_move(&editor, 1, DIR_DOWN);
             break;
-        case '\x1b':
-            running = false;
-            break;
         default:
-            printf("Unsupported key\n");
             break;
         }
     }
 
     restore_mode(&original_settings);
-    return 0;
+    editor_free(&editor);
 }

@@ -1,6 +1,6 @@
-#include "raw.h"
+#include "../include/raw.h"
 
-TC_ERR set_raw_mode() {
+TC_ERR set_raw_mode(void) {
     struct termios raw;
 
     if (tcgetattr(STDIN_FILENO, &raw) == -1) {
@@ -8,7 +8,7 @@ TC_ERR set_raw_mode() {
     }
 
     // Disable echo and canonical mode
-    raw.c_lflag &= ~(ECHO | ICANON);
+    raw.c_lflag &= (unsigned int) ~(ECHO | ICANON);
 
     // Min chars to read
     raw.c_cc[VMIN] = 1;
